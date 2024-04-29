@@ -45,8 +45,18 @@ const deleteUserById = async (req, res) => {
     }
 }
 
+const getDivvysByUserId = async (req, res) => {
+    try {
+        const divvys = await Divvy.find({ owner: req.params.userId });
+        res.status(200).json(divvys);
+    } catch (error) {
+        res.status(500).json({ message: 'Error getting divvys', error: error.message });
+    }
+}
+
     module.exports = {
         createUser,
+        getDivvysByUserId,
         updateUserById,
         getUserById,
         deleteUserById
