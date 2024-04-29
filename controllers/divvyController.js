@@ -57,30 +57,22 @@ export const deleteDivvy = async (req, res) => {
   }
 }
 
-function addParticipantToDivvy(req, res) {
-  // TODO: Implement logic to add a new participant to a divvy
-}
+// Read the details of a specific divvy
+export const getDivvyById = (req, res) => {
+  // TODO: Implement get divvy by ID logic
+};
 
-function updateParticipantInDivvy(req, res) {
-  // TODO: Implement logic to update a participant's details within a divvy
-}
+// Create a new divvy
+export const createDivvy = (req, res) => {
+  // TODO: Implement create divvy logic
+};
 
-function deleteParticipantFromDivvy(req, res) {
-  // TODO: Implement logic to delete a participant from a divvy
-}
+// Update the details of an existing divvy
+export const updateDivvy = (req, res) => {
+  // TODO: Implement update divvy logic
+};
 
-function createTransactionInDivvy(req, res) {
-  // TODO: Implement logic to create a new transaction within a divvy
-}
-
-function getTransactionsInDivvy(req, res) {
-  // TODO: Implement logic to get all transactions associated with a specific divvy
-}
-
-function updateTransactionInDivvy(req, res) {
-  // TODO: Implement logic to update the details of an existing transaction within a divvy
-}
-
-function deleteTransactionFromDivvy(req, res) {
-  // TODO: Implement logic to delete a transaction from a divvy
-}
+// Delete an existing divvy
+export const deleteDivvy = (req, res) => {
+  // TODO: Implement delete divvy logic
+};
