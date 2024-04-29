@@ -33,8 +33,7 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
   },
   breakdown: [{
     participant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Participant',
+      type: String,
       required: true
     },
     percentage: {
@@ -49,6 +48,7 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
 const Participant = mongoose.model('Participant', new mongoose.Schema({
   participantName: {
     type: String,
+    unique: true,
     required: true
   },
   userID: {
