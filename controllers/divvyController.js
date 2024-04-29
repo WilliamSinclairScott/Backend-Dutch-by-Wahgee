@@ -57,9 +57,24 @@ export const deleteDivvy = async (req, res) => {
   }
 }
 
-function addParticipantToDivvy(req, res) {
-  // TODO: Implement logic to add a new participant to a divvy
-}
+//addParticipantToDivvy
+  export const addParticipantToDivvy = async (req, res) => {
+    try {
+      const divvy = await Divvy.findById(req.params.divvyId);
+      if (!divvy) {
+        return res.status(404).json({ message: 'Divvy not found' });
+      } 
+      //// Assuming participant details are passed in the request body.
+      divvy.participants.push(req.body.participantId);
+      await divvy.save();
+    res.status(200).json({ message: 'Participant added successfully', divvy });
+  } catch (error) {
+    res.status(500).json({ message: 'Error adding participant', error: error.message });
+  }
+};
+
+
+  
 
 function updateParticipantInDivvy(req, res) {
   // TODO: Implement logic to update a participant's details within a divvy
