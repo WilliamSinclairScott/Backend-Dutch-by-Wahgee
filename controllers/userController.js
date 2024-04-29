@@ -10,21 +10,15 @@ const updateUserById = (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
-    }
-
+    
     res.status(200).json({
         message: 'User updated successfully',
         user: updatedUser
     });
 
-
-
-    // TODO: Implement the logic to update the user in the database
-
-    // TODO: Return the updated user or an appropriate response
-
-    // Example response
-    res.status(200).json({ message: 'User updated successfully' });
+} catch (error) {
+    res.status(500).json({ message: 'Error updating user', error: error.message });
+    }
 };
 
 module.exports = updateUserById;
