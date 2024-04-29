@@ -12,15 +12,10 @@ export const addParticipant = async (req, res) => {
       const { id } = req.params;
       const { participantName } = req.body;
 
-      
-
       // Find the divvy
       const divvyInQuestion = await Divvy.findById(id);
       // Create the participant
-      const newParticipant = { 
-        participantName: participantName,
-        owesWho : []
-      };
+      const newParticipant = Participant.create(req.body)
       divvyInQuestion.participants.push(newParticipant);
 
       // Save the updated divvy
