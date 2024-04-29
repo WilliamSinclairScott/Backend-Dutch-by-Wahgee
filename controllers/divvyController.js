@@ -19,7 +19,7 @@ export const getDivvyById = async (req, res) => {
       res.status(200).json(divvy)
   } catch (error) {
       res.status(500).json({ message: 'Error getting divvy', error: error.message })
-  }
+  };
 }
 
 function createDivvy(req, res) {
