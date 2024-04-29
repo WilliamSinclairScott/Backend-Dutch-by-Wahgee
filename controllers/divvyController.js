@@ -1,45 +1,26 @@
-import Divvy from '../models/divvyModel';
+import Divvy from "../models/divvyModel";
 
-function getAllDivvys(req, res) {
-  // TODO: Implement logic to get all divvys
-}
+// Read all divvys
+export const getAllDivvys = (req, res) => {
 
-function getDivvyById(req, res) {
-  // TODO: Implement logic to get divvy by ID
-}
+};
 
-function createDivvy(req, res) {
-  // TODO: Implement logic to create a new divvy
-}
+// Read the details of a specific divvy
+export const getDivvyById = (req, res) => {
+  // TODO: Implement get divvy by ID logic
+};
 
-function updateDivvy(req, res) {
-  // TODO: Implement logic to update an existing divvy
-}
+// Create a new divvy
+export const createDivvy = (req, res) => {
+  // TODO: Implement create divvy logic
+};
 
-function addParticipantToDivvy(req, res) {
-  // TODO: Implement logic to add a new participant to a divvy
-}
+// Update the details of an existing divvy
+export const updateDivvy = (req, res) => {
+  // TODO: Implement update divvy logic
+};
 
-function updateParticipantInDivvy(req, res) {
-  // TODO: Implement logic to update a participant's details within a divvy
-}
-
-function deleteParticipantFromDivvy(req, res) {
-  // TODO: Implement logic to delete a participant from a divvy
-}
-
-function createTransactionInDivvy(req, res) {
-  // TODO: Implement logic to create a new transaction within a divvy
-}
-
-function getTransactionsInDivvy(req, res) {
-  // TODO: Implement logic to get all transactions associated with a specific divvy
-}
-
-function updateTransactionInDivvy(req, res) {
-  // TODO: Implement logic to update the details of an existing transaction within a divvy
-}
-
-function deleteTransactionFromDivvy(req, res) {
-  // TODO: Implement logic to delete a transaction from a divvy
-}
+// Delete an existing divvy
+export const deleteDivvy = (req, res) => {
+  // TODO: Implement delete divvy logic
+};

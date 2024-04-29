@@ -1,28 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const divvySchema = new mongoose.Schema({
-  divvyName: {
-    type: String,
-    required: true
-  },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Participant'
-  }],
-  transactions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Transaction'
-  }]
-});
-
-const Divvy = mongoose.model('Divvy', divvySchema);
-
-module.exports = Divvy;
 const Transaction = mongoose.model('Transaction', new mongoose.Schema({
   transactionName: {
     type: String,
@@ -69,4 +46,47 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
   }]
 }));
 
-module.exports = Transaction;
+const Participant = mongoose.model('Participant', new mongoose.Schema({
+  participantName: {
+    type: String,
+    required: true
+  },
+  userID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  owesWho: [{
+    participant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Participant',
+      required: true
+    },
+    amount: {
+      type: Number,
+      required: true
+    }
+  }],
+}));
+
+const divvySchema = new mongoose.Schema({
+  divvyName: {
+    type: String,
+    required: true
+  },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Participant'
+  }],
+  transactions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Transaction'
+  }]
+});
+
+export default Divvy = mongoose.model('Divvy', divvySchema);
