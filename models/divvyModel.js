@@ -65,6 +65,11 @@ const Participant = mongoose.model('Participant', new mongoose.Schema({
     amount: {
       type: Number,
       required: true
+    },
+    forWhat: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Transaction',
+      required: true
     }
   }],
 }));
