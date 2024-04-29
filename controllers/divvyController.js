@@ -56,23 +56,3 @@ export const deleteDivvy = async (req, res) => {
     res.status(500).json({ message: 'Error deleting divvy', error: error.message });
   }
 }
-
-// Read the details of a specific divvy
-export const getDivvyById = (req, res) => {
-  // TODO: Implement get divvy by ID logic
-};
-
-// Create a new divvy
-export const createDivvy = (req, res) => {
-  // TODO: Implement create divvy logic
-};
-
-// Update the details of an existing divvy
-export const updateDivvy = (req, res) => {
-  // TODO: Implement update divvy logic
-};
-
-// Delete an existing divvy
-export const deleteDivvy = (req, res) => {
-  // TODO: Implement delete divvy logic
-};
