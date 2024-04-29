@@ -1,16 +1,30 @@
 import Divvy from '../models/divvyModel';
+import mongoose from 'mongoose';
 
-function getAllDivvys(req, res) {
-  // TODO: Implement logic to get all divvys
+export const getAllDivvys = async (req, res) => {
+  try {
+    const divvys = await Divvy.find().populate('participants transactions')
+      res.status(200).json(divvys)
+  } catch (error) {
+      res.status(500).json({ message: 'Error getting divvys', error: error.message })
+  }
 }
 
-function getDivvyById(req, res) {
-  // TODO: Implement logic to get divvy by ID
+export const getDivvyById = async (req, res) => {
+  try { 
+    const divvy = await Divvy.findById(req.params.id).populate('participants transactions')
+    if (!divvy) {
+      return res.status(404).json({ message: 'Divvy not found' })
+    }
+      res.status(200).json(divvy)
+  } catch (error) {
+      res.status(500).json({ message: 'Error getting divvy', error: error.message })
+  }
 }
 
 function createDivvy(req, res) {
   // TODO: Implement logic to create a new divvy
-}
+} 
 
 function updateDivvy(req, res) {
   // TODO: Implement logic to update an existing divvy
