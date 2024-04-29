@@ -13,6 +13,12 @@ export const signup = async (req, res) => {
     }
 };
 
+/**
+ * Handles user login.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the login process is complete.
+ */
 export const login = async (req, res) => {
     try {
         const user = await User.findOne({ name: req.body.name }).populate('closetItems').populate('associatedTags');
