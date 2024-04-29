@@ -1,6 +1,6 @@
 import user from '../models/userModel';
 
-const updateUserById = (req, res) => {
+const updateUserById = async (req, res) => {
     const userId = req.params.id;
     const updatedUserData = req.body;
 
@@ -21,5 +21,16 @@ const updateUserById = (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Error getting user', error: error.message });
+    }
+}
 module.exports = updateUserById;
-
+module.exports = getUserById;
