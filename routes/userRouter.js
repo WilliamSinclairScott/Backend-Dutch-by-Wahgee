@@ -1,24 +1,26 @@
 import express from 'express';
+
+//TODO: Add auth to router options
 import {
   //TODO: Make functions in userController.js
+  updateUserById,
 
 } from '../controllers/userController.js';
+import {
+  signup,
+  login
+} from '../controllers/authController.js'
+import authCheck from '../utils/auth.js'
 
 const userRouter = express.Router();
 
-// GET all users
-userRouter.get('/', );
+//signup
+userRouter.post('/signup', signup);
 
-// GET a specific user
-userRouter.get('/:id',);
+//login
+userRouter.post('/login', login);
 
-// CREATE a new user
-userRouter.post('/',);
-
-// UPDATE an existing user
-userRouter.put('/:id',);
-
-// DELETE an user
-userRouter.delete('/:id',);
+// update a user
+userRouter.patch('/:id', authCheck ,updateUserById);
 
 export default userRouter;
