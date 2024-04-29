@@ -29,12 +29,16 @@ export const createDivvy = async (req, res) => {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
   }
 };
-
- 
-
-function updateDivvy(req, res) {
-  // TODO: Implement logic to update an existing divvy
-}
+export const updateDivvy = async (req, res) => {
+  try {
+    const updatedDivvy = await Divvy.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedDivvy) {
+      return res.status(404).json({ message: 'Divvy not found' });
+    }
+    res.status(200).json(updatedDivvy);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating divvy', error: error.message });
+  }
 
 function addParticipantToDivvy(req, res) {
   // TODO: Implement logic to add a new participant to a divvy
