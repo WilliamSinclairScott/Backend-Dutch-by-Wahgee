@@ -1,6 +1,8 @@
 import Divvy from "../models/divvyModel";
 
-// Read all divvys
+
+
+// Read all divvys from a user
 export const getAllDivvys = (req, res) => {
 
 };
