@@ -1,5 +1,11 @@
 import Divvy from "../models/divvyModel";
 
+/**
+  *divvyRouter.post('/:id/transactions', createTransaction);
+  *divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
+  *divvyRouter.get('/:id/transactions', deleteTransaction);
+*/
+
 // Create a new transaction within a divvy
 export const createTransaction = (req, res) => {
   // TODO: Implement create transaction logic
