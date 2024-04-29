@@ -9,7 +9,6 @@ export const getAllDivvys = async (req, res) => {
       res.status(500).json({ message: 'Error getting divvys', error: error.message })
   }
 }
-
 export const getDivvyById = async (req, res) => {
   try { 
     const divvy = await Divvy.findById(req.params.id).populate('participants transactions')
@@ -19,12 +18,19 @@ export const getDivvyById = async (req, res) => {
       res.status(200).json(divvy)
   } catch (error) {
       res.status(500).json({ message: 'Error getting divvy', error: error.message })
-  };
+  }
 }
+export const createDivvy = async (req, res) => {
+  try {
+    const newDivvy = new Divvy(req.body);
+    await newDivvy.save();
+      res.status(201).json(newDivvy);
+  } catch (error) {
+      res.status(500).json({ message: 'Error creating divvy', error: error.message });
+  }
+};
 
-function createDivvy(req, res) {
-  // TODO: Implement logic to create a new divvy
-} 
+ 
 
 function updateDivvy(req, res) {
   // TODO: Implement logic to update an existing divvy
