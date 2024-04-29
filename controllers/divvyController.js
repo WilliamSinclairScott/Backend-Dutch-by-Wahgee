@@ -1,6 +1,7 @@
 import Divvy from '../models/divvyModel';
 import mongoose from 'mongoose';
 
+//get all divvys function
 export const getAllDivvys = async (req, res) => {
   try {
     const divvys = await Divvy.find().populate('participants transactions')
@@ -9,6 +10,7 @@ export const getAllDivvys = async (req, res) => {
       res.status(500).json({ message: 'Error getting divvys', error: error.message })
   }
 }
+//get divvy by id function
 export const getDivvyById = async (req, res) => {
   try { 
     const divvy = await Divvy.findById(req.params.id).populate('participants transactions')
@@ -20,6 +22,7 @@ export const getDivvyById = async (req, res) => {
       res.status(500).json({ message: 'Error getting divvy', error: error.message })
   }
 }
+//create divvy function
 export const createDivvy = async (req, res) => {
   try {
     const newDivvy = new Divvy(req.body);
@@ -29,6 +32,7 @@ export const createDivvy = async (req, res) => {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
   }
 };
+//update divvy function
 export const updateDivvy = async (req, res) => {
   try {
     const updatedDivvy = await Divvy.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -40,6 +44,7 @@ export const updateDivvy = async (req, res) => {
       res.status(500).json({ message: 'Error updating divvy', error: error.message });
   }
 }
+//delete divvy function
 export const deleteDivvy = async (req, res) => {
   try {
     const deleteDivvy = await Divvy.findByIdAndDelete(req.params.id);
