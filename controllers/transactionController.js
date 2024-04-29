@@ -15,17 +15,12 @@ export const createTransaction = async (req, res) => {
     if(!divvyInQuestion){
       return res.status(404).json({ message: 'Divvy not found' });
     }
-    //check all the participants in the divvyInQuestion to see if the participant in the transaction exists
+
+    //check if the participants in the transaction exists
     const { breakdown } = req.body;
     for (const participant of breakdown) {
-      const participantInQuestion = await divvyInQuestion.participants.find(participant.participant);
-      //if the participant does not exist, make that participant create a new transaction
-      if(!participantInQuestion){
-        //make new participant create a new transaction
-        const newParticipant = await addParticipant({req}, res);
-        //add the new participant to the divvyInQuestion
-        divvyInQuestion.participants.push(newParticipant._id);
-      }
+      const participantInQuestion = await addParticipant(participant);
+    }
     const newTransaction = {
       ...req.body,
       divvyInQuestion: req.params.id
