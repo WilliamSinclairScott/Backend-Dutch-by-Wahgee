@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    divvys: [{
+    Divvys: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Divvy'
     }]

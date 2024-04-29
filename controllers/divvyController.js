@@ -73,9 +73,6 @@ export const deleteDivvy = async (req, res) => {
   }
 };
 
-
-  
-
 function updateParticipantInDivvy(req, res) {
   // TODO: Implement logic to update a participant's details within a divvy
 }
