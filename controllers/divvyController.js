@@ -35,10 +35,22 @@ export const updateDivvy = async (req, res) => {
     if (!updatedDivvy) {
       return res.status(404).json({ message: 'Divvy not found' });
     }
-    res.status(200).json(updatedDivvy);
+      res.status(200).json(updatedDivvy);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating divvy', error: error.message });
+      res.status(500).json({ message: 'Error updating divvy', error: error.message });
   }
+}
+export const deleteDivvy = async (req, res) => {
+  try {
+    const deleteDivvy = await Divvy.findByIdAndDelete(req.params.id);
+    if (!deleteDivvy) {
+      return res.status(404).json({ message: 'Divvy not found' });
+    }
+    res.status(200).json({ message: 'Divvy deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting divvy', error: error.message });
+  }
+}
 
 function addParticipantToDivvy(req, res) {
   // TODO: Implement logic to add a new participant to a divvy
