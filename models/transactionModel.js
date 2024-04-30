@@ -34,7 +34,7 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
       type: String,
       required: true
     },
-    percentage: {
+    percentage: { 
       type: Number,
       min: 0,
       max: 1,

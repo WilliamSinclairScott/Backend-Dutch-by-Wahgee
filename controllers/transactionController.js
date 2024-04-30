@@ -8,44 +8,59 @@ import { addParticipant } from "participantController.js"
   *divvyRouter.get('/:id/transactions', deleteTransaction);
 */
 
-// Create a new transaction within a divvy
+//divvyRouter.post('/:id/transactions', createTransaction);
 export const createTransaction = async (req, res) => {
-  try{
-    //find the divvyInQuestion by id
-    const divvyInQuestion = await Divvy.findById(req.params.id);
-    //check if the divvyInQuestion exists
-    if(!divvyInQuestion){
-      return res.status(404).json({ message: 'Divvy not found' });
-    }
-
-    //check if the participants in the transaction exists
-    const { breakdown } = req.body;
-    for (const participant of breakdown) {
-      const participantInQuestion = await addParticipant(participant);
-    }
-    const newTransaction = {
-      ...req.body,
-      divvyInQuestion: req.params.id
-    };
-    //save the transaction
-    const transaction = await Transaction.create(newTransaction);
-    //add the transaction to the divvyInQuestion
-    divvyInQuestion.transactions.push(transaction._id);
-    //save the divvyInQuestion
-    await divvyInQuestion.save();
-    //return the divvyInQuestion
-    res.status(201).json(divvyInQuestion);
-  }catch(error){
-    res.status(500).json({ message: 'Error creating transaction', error: error.message });
   
-  }
-};
+  try { 
+    //getting ID from the route
+    const { divvyId } = req.params;
+    //getting data from the request
+    const { breakdown } = req.body
 
-//createTransactionInDivvy
-export const createTransactionInDivvy = async (req, res) => {
-  const { divvyId } = req.params;
-  const transactionData = req.body;
-  try {
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const newParticipants = breakdown.map(owesWho => {
+      if (owesWho._id) {
+        return owesWho.findByIdAndUpdate(owesWho._id,
+          {
+            owesWhoName: owesWho.owesWhoName,
+            userID: userID ? mongoose.Types.ObjectId(userID) : null,
+            //if the owesWho is being updated, update the owesWho array based on the new owesWho object
+            owesWho: owesWho.owesWho
+          }
+          , { new: true });
+      }
+      //if the owesWho is new,i.e.there is no _id, create a new owesWho object
+      return new owesWho(owesWho);
+    })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     const transaction = new Transaction(transactionData)
     const savedTransaction = await transaction.save();
     const divvy = await Divvy.findByIdAndUpdate(
