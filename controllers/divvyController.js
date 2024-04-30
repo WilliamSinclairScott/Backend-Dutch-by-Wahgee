@@ -33,10 +33,10 @@ export const createDivvy = async (req, res) => {
     const {divvyName, owner,participants} = req.body;
     
     //make a participant for every participant in the participants array
-    const newParticipants = participants.map(participant => {
-      return new Participant(participant);
+    const newParticipants = participants.map( async participant => {
+      return await new Participant(participant);
     });
-
+    await Promise.all(newParticipants)
     const newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
@@ -58,20 +58,22 @@ export const updateDivvy = async (req, res) => {
     const {divvyName, userID, owner, participants} = req.body;
     
     //foreach participant in the participants array, see if they are already a participant
-    const newParticipants = participants.map(participant => {
-      if (participant._id) {
-        return Participant.findByIdAndUpdate(participant._id,
-          {
-            participantName: participant.participantName,
-            userID: userID ? mongoose.Types.ObjectId(userID) : null,
-            //if the participant is being updated, update the owesWho array based on the new participant object
-            owesWho: participant.owesWho
-          }
-          , { new: true });
-      }
-      //if the participant is new,i.e.there is no _id, create a new participant object
-      return new Participant(participant);
+    const newParticipants = participants.map( async participant => {
+      return await Participant.findByIdAndUpdate(participant._id,
+        {
+          participantName: typeof participant === String ? participant : participant.participantName,
+          userID: userID ? mongoose.Types.ObjectId(userID) : null,
+          //if the participant is being updated, update the owesWho array based on the new participant object
+          owesWho: participant.owesWho
+        }, 
+        { new: true, upsert: true});
+      
+      //note: removed if statement and added upsert to reflect across. 
+      //If that fails, we can add a check for the participant's existence
+      // return await new Participant(participant);
     })
+    //wait for all promises
+    await Promise.all(newParticipants);
 
     const updatedDivvy = await Divvy.findByIdAndUpdate(req.params.id, 
       {
