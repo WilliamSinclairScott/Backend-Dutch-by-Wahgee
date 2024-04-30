@@ -15,54 +15,34 @@ export const createTransaction = async (req, res) => {
     //getting ID from the route
     const { divvyId } = req.params;
     //getting data from the request
-    const { paidBy, breakdown, transactionName } = req.body
-    const theirPart //!!ADD ME!!
+    const { paidBy, breakdown, transactionName, amount } = req.body
+    
 
+//foreach person that was involved in the transaction,
+// assign percentage their responsible for,
+// and if not participant, now they are (see upsert)
+    const newParticipants = breakdown.map(async participantInfo => {
 
+      return await Participant.findOneAndUpdate(
+        // Assuming 'participantInfo' can be a string or an object containing a name and theirPart.
+        { name:  typeof participantInfo === 'string' ? 
+        participantInfo : participantInfo.name },
+        // Find or create participant using 'findOneAndUpdate' with 'upsert' option
+        {
+          $push: { 
+            owesWho: {
+              participant: paidBy,
+              amount: participantInfo.percentage * amount,
+              forWhat: transactionName
+            }
+          }}, 
+          { new: true, upsert: true })
+    });
+    
 
-
-
-
-
-
-
-
-
-
-//forEach name in breakdown, assign owesWho to name. 
-    const newParticipants = breakdown.map(owesWho => {
-      if (owesWho.name) {
-        Participant.findOneAndUpdate(
-          owesWho.name,
-          {
-          $push: { owesWho: {
-            participant : paidBy , 
-            amount : theirPart , 
-            forWhat : transactionName
-          } }
-          }
-          , { new: true });
-      }
-      //if the owesWho is new,i.e.there is no _id, create a new owesWho object
-      return new owesWho(owesWho);
-    })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    // Use Promise.all to handle all the operations
+    Promise.all(newParticipants)
     const transaction = new Transaction(transactionData)
     const savedTransaction = await transaction.save();
     const divvy = await Divvy.findByIdAndUpdate(
