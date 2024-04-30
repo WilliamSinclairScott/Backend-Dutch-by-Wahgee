@@ -30,11 +30,11 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
     required: false
   },
   breakdown: [{
-    participant: {
+    name: {
       type: String,
       required: true
     },
-    percentage: {
+    percentage: { 
       type: Number,
       min: 0,
       max: 1,

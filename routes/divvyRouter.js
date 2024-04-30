@@ -31,11 +31,6 @@ divvyRouter.post('/', createDivvy);
 divvyRouter.patch('/:id', updateDivvy);
 divvyRouter.delete('/:id', deleteDivvy);
 
-//Participant Routes
-divvyRouter.post('/:id/participants', addParticipant);
-divvyRouter.patch('/:id/participants/:participantId', updateParticipant);
-divvyRouter.delete('/:id/participants/:participantId', deleteParticipant);
-
 //Transaction Routes
 divvyRouter.post('/:id/transactions', createTransaction);
 divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);

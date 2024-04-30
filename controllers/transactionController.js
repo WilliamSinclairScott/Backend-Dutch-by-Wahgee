@@ -8,94 +8,122 @@ import { addParticipant } from "participantController.js"
   *divvyRouter.get('/:id/transactions', deleteTransaction);
 */
 
-// Create a new transaction within a divvy
+//divvyRouter.post('/:id/transactions', createTransaction);
 export const createTransaction = async (req, res) => {
-  try{
-    //find the divvyInQuestion by id
-    const divvyInQuestion = await Divvy.findById(req.params.id);
-    //check if the divvyInQuestion exists
-    if(!divvyInQuestion){
-      return res.status(404).json({ message: 'Divvy not found' });
-    }
-
-    //check if the participants in the transaction exists
-    const { breakdown } = req.body;
-    for (const participant of breakdown) {
-      const participantInQuestion = await addParticipant(participant);
-    }
-    const newTransaction = {
-      ...req.body,
-      divvyInQuestion: req.params.id
-    };
-    //save the transaction
-    const transaction = await Transaction.create(newTransaction);
-    //add the transaction to the divvyInQuestion
-    divvyInQuestion.transactions.push(transaction._id);
-    //save the divvyInQuestion
-    await divvyInQuestion.save();
-    //return the divvyInQuestion
-    res.status(201).json(divvyInQuestion);
-  }catch(error){
-    res.status(500).json({ message: 'Error creating transaction', error: error.message });
   
-  }
-};
-
-// Update the details of an existing transaction within a divvy
-export const updateTransaction = async (req, res) => {
-  // TODO: Implement update transaction logic
-};
-
-// Delete a transaction from a divvy
-export const deleteTransaction = async (req, res) => {
-  // TODO: Implement delete transaction logic
-};
-
-//createTransactionInDivvy
-export const createTransactionInDivvy = async (req, res) => {
-  const { divvyId } = req.params;
-  const transactionData = req.body;
-  try {
-    const transaction = new Transaction(transactionData)
-    const savedTransaction = await transaction.save();
-    const divvy = await Divvy.findByIdAndUpdate(
-      divvyId,
-      { $push: { transactions: savedTransaction._id } },
-      { new: true }
-    ).populate('participants transactions');
+  try { 
+    //getting ID from the route
+    const { divvyId } = req.params;
     if (!divvy) {
       return res.status(404).json({ message: 'Divvy not found' });
   }
-  res.status(201).json({
-    message: 'Transaction created successfully',
-    divvy,
-    transaction: savedTransaction
-  });
+    //getting data from the request
+    const { paidBy, breakdown, transactionName, amount } = req.body
+    
+
+//foreach person that was involved in the transaction,
+// assign percentage their responsible for,
+// and if not participant, now they are (see upsert)
+    const involvedParticipants = breakdown.map(async participantInfo => {
+
+      return await Participant.findOneAndUpdate(
+        // Assuming 'participantInfo' can be a string or an object containing a name and theirPart.
+        { name:  typeof participantInfo === 'string' ? 
+        participantInfo : participantInfo.name },
+        // Find or create participant using 'findOneAndUpdate' with 'upsert' option
+        {
+          $push: { 
+            owesWho: {
+              participant: paidBy,
+              amount: participantInfo.percentage * amount,
+              forWhat: transactionName
+            }
+          }}, 
+          { new: true, upsert: true })
+    });
+    // Use Promise.all to handle all the operations
+    Promise.all(involvedParticipants)
+    //make new transaction subdocument
+    const transaction = new Transaction(req.body)
+    const divvy = await Divvy.findByIdAndUpdate(
+      divvyId,
+      { $push: { transactions: transaction } },
+      { new: true })
+    
+  res.status(201).json(divvy); 
   } catch (error) {
     res.status(500).json({ message: 'Error creating transaction', error: error.message });
   }
 }
-export const getTransactionsInDivvy = async (req, res) => {
-  const { divvyId } = req.params;
-  try {
-    const divvyWithTransactions = await Divvy.findById(divvyId)
-    .populate('transactions');
-    if (!divvyWithTransactions) {
-      return res.status(404).json({ message: 'Divvy not found' });
-  }
-    if (divvyWithTransactions.transactions.length === 0) {
-      return res.status(200).json({ message: 'No transactions found for this divvy', transactions: [] });
-  }
-  res.status(200).json(divvyWithTransactions.transactions);
-  } catch (error) {
-    res.status(500).json({ message: 'Error getting transactions', error: error.message });
-  }
-};
+//divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
+  export const updateTransaction = async (req, res) => {
+try {
+  //getting divvyID and transactionID from the route
+  const { divvyId, transactionId } = req.params
+  const transactionUpdates = req.body
+  //find all users in the Divvy
+  const divvy = await Divvy.findById(divvyId)
+  //if participant in divvy has an owesWho.forWhat that matches the transactionId remove it
+  const participants = divvy.participants.map(async participant => {
+    participant.owesWho = participant.owesWho.filter(owe => owe.forWhat !== transactionId)
+  })
+  // Use Promise.all to handle all the operations 
+  Promise.all(participants)
 
-function updateTransactionInDivvy(req, res) {
-  // TODO: Implement logic to update the details of an existing transaction within a divvy
+  //getting data from the request
+  const { paidBy, breakdown, transactionName, amount } = req.body
+    
+
+  //foreach person that was involved in the transaction,
+  // assign percentage their responsible for,
+  // and if not participant, now they are (see upsert)
+      const involvedParticipants = breakdown.map(async participantInfo => {
+  
+        return await Participant.findOneAndUpdate(
+          // Assuming 'participantInfo' can be a string or an object containing a name and theirPart.
+          { name:  typeof participantInfo === 'string' ? 
+          participantInfo : participantInfo.name },
+          // Find or create participant using 'findOneAndUpdate' with 'upsert' option
+          {
+            $push: { 
+              owesWho: {
+                participant: paidBy,
+                amount: participantInfo.percentage * amount,
+                forWhat: transactionName
+              }
+            }}, 
+            { new: true, upsert: true })
+      });
+      // Use Promise.all to handle all the operations
+          Promise.all(involvedParticipants)
+
+      //make new transaction subdocument
+      const transaction = new Transaction(transactionUpdates) 
+      //update the transaction
+      const updatedDivvy = await Divvy.findByIdAndUpdate(
+        divvyId,
+        { $pull: { transactions: { _id: transactionId } }, 
+          $push: { transactions: transaction } },
+        { new: true }
+      );
+      updatedDivvy.transactions.push(transaction);
+      await updatedDivvy.save();
+  res.status(200).json(updatedDivvy)
+
+} catch (error) {
+  res.status(500).json({ message: 'Error updating transaction', error: error.message });
 }
+  }
 
-function deleteTransactionFromDivvy(req, res) {
-  // TODO: Implement logic to delete a transaction from a divvy
+export const deleteTransaction = async (req, res) => {
+  try {
+    const { divvyId, transactionId } = req.params;
+    const divvy = await Divvy.findById(divvyId);
+    const updated = divvy.transactions.filter(transaction => transaction._id !== transactionId);
+    divvy.transactions = updated;
+    await divvy.save();
+    res.status(200).json(divvy);
+} catch (error) {
+    res.status(500).json({ message: 'Error deleting transaction', error: error.message });
+}
 }
