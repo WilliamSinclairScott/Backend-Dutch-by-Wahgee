@@ -10,6 +10,7 @@ import {
   signup,
   login
 } from '../controllers/authController.js'
+
 import authCheck from '../utils/auth.js'
 
 const userRouter = express.Router();
@@ -22,5 +23,14 @@ userRouter.post('/login', login);
 
 // update a user
 userRouter.patch('/:id', authCheck ,updateUserById);
+
+// get a user by ID
+userRouter.get('/:id', authCheck, getUserById);
+
+// delete a user 
+userRouter.delete('/:id', authCheck, deleteUserById);
+
+// get all divvys by a user
+userRouter.get('/:userId/divvys', authCheck, getDivvysByUserId); 
 
 export default userRouter;

@@ -4,6 +4,7 @@ import Divvy from '../models/divvyModel';
 
 
 
+
 //get all divvys function
 export const getAllDivvys = async (req, res) => {
   try {
