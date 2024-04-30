@@ -15,7 +15,8 @@ export const createTransaction = async (req, res) => {
     //getting ID from the route
     const { divvyId } = req.params;
     //getting data from the request
-    const { breakdown } = req.body
+    const { paidBy, breakdown, transactionName } = req.body
+    const theirPart //!!ADD ME!!
 
 
 
@@ -28,16 +29,17 @@ export const createTransaction = async (req, res) => {
 
 
 
-
-
+//forEach name in breakdown, assign owesWho to name. 
     const newParticipants = breakdown.map(owesWho => {
-      if (owesWho._id) {
-        return owesWho.findByIdAndUpdate(owesWho._id,
+      if (owesWho.name) {
+        Participant.findOneAndUpdate(
+          owesWho.name,
           {
-            owesWhoName: owesWho.owesWhoName,
-            userID: userID ? mongoose.Types.ObjectId(userID) : null,
-            //if the owesWho is being updated, update the owesWho array based on the new owesWho object
-            owesWho: owesWho.owesWho
+          $push: { owesWho: {
+            participant : paidBy , 
+            amount : theirPart , 
+            forWhat : transactionName
+          } }
           }
           , { new: true });
       }

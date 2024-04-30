@@ -30,7 +30,7 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
     required: false
   },
   breakdown: [{
-    participant: {
+    name: {
       type: String,
       required: true
     },
