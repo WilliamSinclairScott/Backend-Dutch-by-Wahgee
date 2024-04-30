@@ -10,6 +10,7 @@ import {
   signup,
   login
 } from '../controllers/authController.js'
+
 import authCheck from '../utils/auth.js'
 
 const userRouter = express.Router();
