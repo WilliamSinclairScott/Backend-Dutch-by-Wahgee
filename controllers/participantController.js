@@ -1,4 +1,6 @@
 import Divvy from "../models/divvyModel";
+import Participant from "../models/participantModel";
+import Transaction from "../models/transactionModel";
 
 /**
  *divvyRouter.post('/:id/participants', addParticipant);

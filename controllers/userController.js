@@ -1,4 +1,4 @@
-import user from '../models/userModel';
+import User from '../models/userModel';
 
 const updateUserById = async (req, res) => {
     const userId = req.params.id;

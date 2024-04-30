@@ -1,5 +1,6 @@
-import Divvy from '../models/divvyModel';
 import mongoose from 'mongoose';
+import Divvy from '../models/divvyModel';
+
 
 //get all divvys function
 export const getAllDivvys = async (req, res) => {

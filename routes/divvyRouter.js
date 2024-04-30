@@ -1,10 +1,11 @@
 import express from 'express';
+
 import {
-getAllDivvys,
-createDivvy,
-getDivvyById,
-updateDivvy,
-deleteDivvy,
+  getAllDivvys,
+  createDivvy,
+  getDivvyById,
+  updateDivvy,
+  deleteDivvy,
 } from '../controllers/divvyController.js';
 
 import {
