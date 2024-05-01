@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const transactionSchema = new mongoose.Schema({
+export const transactionSchema = new mongoose.Schema({
   transactionName: {
     type: String,
     required: true
