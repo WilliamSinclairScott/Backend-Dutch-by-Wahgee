@@ -22,7 +22,7 @@ const divvyRouter = express.Router();
 divvyRouter.get('/', getAllDivvys);
 divvyRouter.get('/:id', getDivvyById); //
 divvyRouter.post('/', createDivvy); //
-divvyRouter.patch('/:id', updateDivvy);
+divvyRouter.patch('/:id', updateDivvy); //
 divvyRouter.delete('/:id', deleteDivvy);
 
 //Transaction Routes

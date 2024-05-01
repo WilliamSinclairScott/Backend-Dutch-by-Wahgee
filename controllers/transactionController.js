@@ -47,9 +47,9 @@ export const createTransaction = async (req, res) => {
     console.log(transaction)
     const divvy = await Divvy.findByIdAndUpdate(
       id,
-      { $push: { transactions: transaction._id } },
+      { $push: { transactions: transaction.id } },
+
       { new: true })
-    .populate('transactions');
     
   res.status(201).json(divvy); 
   } catch (error) {
