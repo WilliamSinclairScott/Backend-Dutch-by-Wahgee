@@ -34,6 +34,6 @@ userRouter.patch('/:id' ,updateUserById);
 
 
 // delete a user 
-userRouter.delete('/:id', deleteUserById);
+userRouter.delete('/:id', authCheck ,deleteUserById);
 
 export default userRouter;
