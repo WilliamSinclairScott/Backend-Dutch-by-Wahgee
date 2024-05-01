@@ -26,9 +26,8 @@ export const getDivvyById = async (req, res) => {
       res.status(500).json({ message: 'Error getting divvy', error: error.message })
   }
 }
-//create divvy function
+
 /**
- * 
  * @param {*} req PUT THE OWNER NAME IN THE PARTICIPANTS ARRAY
  * @param {*} res 
  */
