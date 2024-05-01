@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
+import {participantSchema} from './participantModel.js';
+import {transactionSchema} from './transactionModel.js';
 
-const divvySchema = new mongoose.Schema({
+
+export const divvySchema = new mongoose.Schema({
   divvyName: {
     type: String,
     required: true
@@ -10,15 +13,27 @@ const divvySchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Participant'
-  }],
-  transactions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Transaction'
-  }]
-});
+  participants: [participantSchema],
+  transactions: [transactionSchema]
+})
 
-const Divvy = mongoose.model('Divvy', divvySchema);
+divvySchema.pre('save', async function(next) {
+  try {
+
+    const populatedDivvy = await this.populate('participants transactions').execPopulate();
+    this.participants = populatedDivvy.participants;
+    this.transactions = populatedDivvy.transactions;
+
+    const ownerUser = await User.findById(this.owner)
+    ownerUser.Divvys.push(this._id)
+    await ownerUser.save()
+    next()
+  } catch (error) {
+    next(error)
+  }
+})
+
+const Divvy = mongoose.model('Divvy', divvySchema)
+
+
 export default Divvy;
