@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import Participant from '../models/participantModel.js';
 import Divvy from '../models/divvyModel.js';
-
+import User from '../models/userModel.js';
 
 
 
@@ -27,23 +27,33 @@ export const getDivvyById = async (req, res) => {
   }
 }
 //create divvy function
-//TODO: Test this
+/**
+ * 
+ * @param {*} req PUT THE OWNER NAME IN THE PARTICIPANTS ARRAY
+ * @param {*} res 
+ */
 export const createDivvy = async (req, res) => {
   try {
-    const {divvyName, owner,participants} = req.body;
-    
+    const {divvyName, owner, participants} = req.body;
+    //participants is always an array of strings
+    (await User.findById(owner)) ? null : res.status(404).json({ message: 'Owner not found' });
     //make a participant for every participant in the participants array
     const newParticipants = participants.map( async participant => {
-      return await new Participant(participant);
+      return new Participant({ participantName : participant});
     });
     await Promise.all(newParticipants)
+
     const newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
       participants: newParticipants}
-    );
-    await newDivvy.save();
-      res.status(201).json(newDivvy);
+    )
+
+    const ownerUser = await User.findByIdAndUpdate(owner, 
+      { $push: { Divvys : newDivvy } },
+      { new: true })
+    await ownerUser.save();
+    res.status(201).json(ownerUser);
   } catch (error) {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
   }
