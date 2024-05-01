@@ -1,4 +1,6 @@
-const Transaction = mongoose.model('Transaction', new mongoose.Schema({
+import mongoose from 'mongoose';
+
+const transactionSchema = new mongoose.Schema({
   transactionName: {
     type: String,
     required: true
@@ -41,6 +43,7 @@ const Transaction = mongoose.model('Transaction', new mongoose.Schema({
       required: true
     }
   }]
-}));
+});
 
-export default Transaction = mongoose.model('Transaction', transactionSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
+export default Transaction 

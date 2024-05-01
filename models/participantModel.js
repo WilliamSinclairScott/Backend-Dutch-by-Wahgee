@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const Participant = mongoose.model('Participant', new mongoose.Schema({
+const participantSchema = new mongoose.Schema({
   participantName: {
     type: String,
     unique: true,
@@ -27,6 +27,7 @@ const Participant = mongoose.model('Participant', new mongoose.Schema({
       required: true
     }
   }],
-}));
+});
 
-export default Participant = mongoose.model('Participant', participantSchema);
+const Participant = mongoose.model('Participant', participantSchema);
+export default Participant

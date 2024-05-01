@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import Participant from '../models/participantModel';
-import Divvy from '../models/divvyModel';
+import Participant from '../models/participantModel.js';
+import Divvy from '../models/divvyModel.js';
 
 
 
