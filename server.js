@@ -14,7 +14,7 @@ import divvyRouter from './routes/divvyRouter.js'
 //initialize variables
 const PORT = process.env.PORT || 7777
 const corsOptions = { 
-  //!!Need to change
+  //!!Temporary unsecure fast and loose CORS policy
   origin: [['http://localhost:5173', 'http://127.0.0.1:5173']], 
   credentials: true
 }
@@ -31,7 +31,7 @@ try {
 
 //middleware
 app.use(express.json())
-app.use(cors()) //corsOptions
+app.use(cors(corsOptions))
 app.use(morgan('dev'))
 app.use(cookieParser())
 
