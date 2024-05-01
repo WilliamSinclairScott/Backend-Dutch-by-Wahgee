@@ -12,10 +12,9 @@ export const createTransaction = async (req, res) => {
   
   try { 
     //getting ID from the route
-    const { divvyId } = req.params;
-    if (!divvy) {
-      return res.status(404).json({ message: 'Divvy not found' });
-  }
+    const { id } = req.params;
+    console.log(id)
+    
     //getting data from the request
     const { paidBy, breakdown, transactionName, amount } = req.body
     
@@ -44,9 +43,12 @@ export const createTransaction = async (req, res) => {
     Promise.all(involvedParticipants)
     //make new transaction subdocument
     const transaction = new Transaction(req.body)
+    await transaction.save(); // save the transaction to database
+    console.log(transaction)
     const divvy = await Divvy.findByIdAndUpdate(
-      divvyId,
-      { $push: { transactions: transaction } },
+      id,
+      { $push: { transactions: transaction.id } },
+
       { new: true })
     
   res.status(201).json(divvy); 

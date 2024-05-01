@@ -55,33 +55,28 @@ export const createDivvy = async (req, res) => {
 export const updateDivvy = async (req, res) => {
   try {
     //desconstruct the req.body object
-    const {divvyName, userID, owner, participants} = req.body;
+    const {divvyName, userID, owner, participants, owesWho} = req.body;
     
     //foreach participant in the participants array, see if they are already a participant
-    const newParticipants = participants.map( async participant => {
-      return await Participant.findByIdAndUpdate(participant._id,
-        {
-          participantName: typeof participant === String ? participant : participant.participantName,
-          userID: userID ? mongoose.Types.ObjectId(userID) : null,
-          //if the participant is being updated, update the owesWho array based on the new participant object
-          owesWho: participant.owesWho
-        }, 
-        { new: true, upsert: true});
-      
-      //note: removed if statement and added upsert to reflect across. 
-      //If that fails, we can add a check for the participant's existence
-      // return await new Participant(participant);
-    })
+    const updatedParticipants = await Promise.all(participants.map(async participantName => {
+      const updatedParticipant = await Participant.findOneAndUpdate(
+        { participantName },
+        { participantName, userID: userID ? mongoose.Types.ObjectId(userID) : null },
+        { new: true, upsert: true }
+      );
+      return updatedParticipant._id; // Return the ObjectId reference of the updated participant
+    }));
     //wait for all promises
-    await Promise.all(newParticipants);
-
-    const updatedDivvy = await Divvy.findByIdAndUpdate(req.params.id, 
+    const updatedDivvy = await Divvy.findByIdAndUpdate(
+      req.params.id,
       {
-        divvyName: divvyName,
-        owner: owner,
-        //this causes deletion through exclusion
-        participants: newParticipants
-      }, { new: true });
+        divvyName,
+        owner,
+        participants: updatedParticipants, // Use updatedParticipants instead of newParticipants
+        owesWho: owesWho ? owesWho : [] // Ensure proper handling of owesWho field
+      },
+      { new: true }
+    );
     if (!updatedDivvy) {
       return res.status(404).json({ message: 'Divvy not found' });
     }

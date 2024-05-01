@@ -4,7 +4,7 @@ export const updateUserById = async (req, res) => {
     const userId = req.params.id;
     const updatedUserData = req.body;
     try { 
-        const updatedUser = await user.findByIdAndUpdate(userId, updatedUserData, { new: true })
+        const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, { new: true })
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' })
         }
