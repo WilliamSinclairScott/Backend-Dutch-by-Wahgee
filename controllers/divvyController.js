@@ -64,38 +64,65 @@ export const createDivvy = async (req, res) => {
   }
 };
 
-//update divvy function
-// add delete participant and change name of divvy/participants
-//!!CANNOT DELETE PARTICIPANT IF OWESWHO IS NOT EMPTY
+/**
+ *  add delete participant and change name of divvy/participants
+ *  !!CANNOT DELETE PARTICIPANT IF OWESWHO IS NOT EMPTY
+ * @param {*} req HAND ME ALL THE PARTICIPANTS, even the ones that arn't changed
+ * @param {*} res 
+ * @returns 
+ */
+//
 export const updateDivvy = async (req, res) => {
   try {
     //desconstruct the req.body object
-    const {divvyName, userID, owner, participants, owesWho} = req.body;
-    
-    //foreach participant in the participants array, see if they are already a participant
-    const updatedParticipants = await Promise.all(participants.map(async participantName => {
-      const updatedParticipant = await Participant.findOneAndUpdate(
-        { participantName },
-        { participantName, userID: userID ? mongoose.Types.ObjectId(userID) : null },
-        { new: true, upsert: true }
-      );
-      return updatedParticipant._id; // Return the ObjectId reference of the updated participant
-    }));
-    //wait for all promises
-    const updatedDivvy = await Divvy.findByIdAndUpdate(
-      req.params.id,
-      {
-        divvyName,
-        owner,
-        participants: updatedParticipants, // Use updatedParticipants instead of newParticipants
-        owesWho: owesWho ? owesWho : [] // Ensure proper handling of owesWho field
-      },
-      { new: true }
-    );
-    if (!updatedDivvy) {
+    const { id } = req.params;
+    const {divvyName, owner, participants } = req.body;
+    //find the divvy by id
+    const divvy = await Divvy.findById(id);
+    if (!divvy) {
       return res.status(404).json({ message: 'Divvy not found' });
     }
-      res.status(200).json(updatedDivvy);
+    //see if name needs to change
+    if (divvy.divvyName !== divvyName) {
+      divvy.divvyName = divvyName;
+    }
+    // map the participants
+    console.log(divvy.participants)
+    const updatedParticipants = participants.map(participant => {
+      console.log('participant: ', participant)
+      //check if this participant is a string, or the participant Object
+      if (typeof participant === 'string') {
+          return new Participant({ participantName: participant });
+      } else {
+        //if the participant is an object, find the participant by id
+        const existingParticipant = divvy.participants.find(p => p._id.equals(participant._id));
+        //if the participant is not found, create a new participant
+        //!! this is a catch all and just shouldnt happen
+        if (!existingParticipant) {
+          throw new Error('Participant ID not in this divvy');
+          //return new Participant({ participantName: participant.participantName });
+        } else {
+          //if the participant is found, update the participant
+          if (existingParticipant.participantName !== participant.participantName) {
+            existingParticipant.participantName = participant.participantName;
+          }
+          return existingParticipant;
+        }
+      }
+    })
+
+    //find owner
+    const ownerUser = await User.findById(owner);
+    if (!ownerUser) {
+      return res.status(404).json({ message: 'Owner not found' });
+    }
+
+    //override the divvy participants with the updated participants
+    divvy.participants = updatedParticipants;
+    //save the divvy
+    await divvy.save();
+    const response = await ownerUser.populate('Divvys');
+    res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error updating divvy', error: error.message });
   }
