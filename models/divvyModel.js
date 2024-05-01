@@ -20,4 +20,5 @@ const divvySchema = new mongoose.Schema({
   }]
 });
 
-export default Divvy = mongoose.model('Divvy', divvySchema); 
+const Divvy = mongoose.model('Divvy', divvySchema);
+export default Divvy;

@@ -9,12 +9,6 @@ import {
 } from '../controllers/divvyController.js';
 
 import {
-  addParticipant,
-  updateParticipant,
-  deleteParticipant,
-} from '../controllers/participantController.js';
-
-import {
   createTransaction,
   updateTransaction,
   deleteTransaction

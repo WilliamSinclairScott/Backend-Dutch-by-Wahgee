@@ -1,7 +1,6 @@
-import Divvy from "../models/divvyModel";
-import Participant from "../models/participantModel";
-import Transaction from "../models/transactionModel";
-import { addParticipant } from "participantController.js"
+import Divvy from "../models/divvyModel.js";
+import Participant from "../models/participantModel.js";
+import Transaction from "../models/transactionModel.js";
 /**
   *divvyRouter.post('/:id/transactions', createTransaction);
   *divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
