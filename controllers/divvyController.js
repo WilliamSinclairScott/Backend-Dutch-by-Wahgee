@@ -43,17 +43,20 @@ export const createDivvy = async (req, res) => {
     });
     await Promise.all(newParticipants)
 
-    const newDivvy = new Divvy({
+    console.log('newParticipants: ', newParticipants)
+    let newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
       participants: newParticipants}
     )
-
+    newDivvy = await newDivvy.populate();
+    await newDivvy.save();
     const ownerUser = await User.findByIdAndUpdate(owner, 
       { $push: { Divvys : newDivvy } },
       { new: true })
+    console.log(ownerUser)
     await ownerUser.save();
-    res.status(201).json(ownerUser);
+    res.status(201).json(ownerUser).populate('Divvys');
   } catch (error) {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
   }

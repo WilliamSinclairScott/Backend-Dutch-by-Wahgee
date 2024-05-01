@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
+import {participantSchema} from './participantModel.js';
+import {transactionSchema} from './transactionModel.js';
 
-const divvySchema = new mongoose.Schema({
+
+export const divvySchema = new mongoose.Schema({
   divvyName: {
     type: String,
     required: true
@@ -10,14 +13,8 @@ const divvySchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  participants: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Participant'
-  }],
-  transactions: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Transaction'
-  }]
+  participants: [participantSchema],
+  transactions: [transactionSchema]
 })
 
 divvySchema.pre('save', async function(next) {

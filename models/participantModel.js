@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const participantSchema = new mongoose.Schema({
+export const participantSchema = new mongoose.Schema({
   participantName: {
     type: String,
     unique: true,

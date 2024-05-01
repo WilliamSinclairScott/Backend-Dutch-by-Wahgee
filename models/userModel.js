@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-
+import {divvySchema} from './divvyModel.js';
 // user schema
 const userSchema = new mongoose.Schema({
     email: {
