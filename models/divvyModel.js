@@ -17,21 +17,21 @@ export const divvySchema = new mongoose.Schema({
   transactions: [transactionSchema]
 })
 
-divvySchema.pre('save', async function(next) {
-  try {
+// divvySchema.pre('save', async function(next) {
+//   try {
 
-    const populatedDivvy = await this.populate('participants transactions').execPopulate();
-    this.participants = populatedDivvy.participants;
-    this.transactions = populatedDivvy.transactions;
+//     const populatedDivvy = await this.populate('participants transactions').execPopulate();
+//     this.participants = populatedDivvy.participants;
+//     this.transactions = populatedDivvy.transactions;
 
-    const ownerUser = await User.findById(this.owner)
-    ownerUser.Divvys.push(this._id)
-    await ownerUser.save()
-    next()
-  } catch (error) {
-    next(error)
-  }
-})
+//     const ownerUser = await User.findById(this.owner)
+//     ownerUser.Divvys.push(this._id)
+//     await ownerUser.save()
+//     next()
+//   } catch (error) {
+//     next(error)
+//   }
+// })
 
 const Divvy = mongoose.model('Divvy', divvySchema)
 

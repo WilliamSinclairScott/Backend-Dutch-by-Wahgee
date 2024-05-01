@@ -38,25 +38,27 @@ export const createDivvy = async (req, res) => {
     //participants is always an array of strings
     (await User.findById(owner)) ? null : res.status(404).json({ message: 'Owner not found' });
     //make a participant for every participant in the participants array
-    const newParticipants = participants.map( async participant => {
+    const newParticipants = participants.map( participant => {
       return new Participant({ participantName : participant});
     });
-    await Promise.all(newParticipants)
 
     console.log('newParticipants: ', newParticipants)
-    let newDivvy = new Divvy({
+
+    const newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
       participants: newParticipants}
     )
-    newDivvy = await newDivvy.populate();
+
+    console.log('newDivvy: ', newDivvy)
     await newDivvy.save();
     const ownerUser = await User.findByIdAndUpdate(owner, 
       { $push: { Divvys : newDivvy } },
       { new: true })
     console.log(ownerUser)
     await ownerUser.save();
-    res.status(201).json(ownerUser).populate('Divvys');
+    const response = await ownerUser.populate('Divvys');
+    res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
   }
