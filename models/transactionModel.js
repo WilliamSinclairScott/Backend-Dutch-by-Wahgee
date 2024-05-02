@@ -3,19 +3,19 @@ import mongoose from 'mongoose';
 export const transactionSchema = new mongoose.Schema({
   transactionName: {
     type: String,
+    unique : true,
     required: true
   },
   date: {
     type: Date,
-    required: true
+    required: false
   },
   amount: {
     type: Number,
     required: true
   },
   paidBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Participant',
+    type: String,
     required: true
   },
   type: {
