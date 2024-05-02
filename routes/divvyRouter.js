@@ -27,7 +27,7 @@ divvyRouter.delete('/:id', deleteDivvy);
 
 //Transaction Routes
 divvyRouter.post('/:id/transaction', createTransaction); // 
-divvyRouter.put('/:id/transaction/:transactionId', updateTransaction);
-divvyRouter.get('/:id/transaction', deleteTransaction);
+divvyRouter.patch('/:id/transaction/:transactionId', updateTransaction);
+divvyRouter.delete('/:id/transaction/:transactionId', deleteTransaction);
 
 export default divvyRouter;
