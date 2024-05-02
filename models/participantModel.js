@@ -12,9 +12,8 @@ export const participantSchema = new mongoose.Schema({
     required: false
   },
   owesWho: [{
-    participant: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Participant',
+    name: {
+      type: String,
       required: true
     },
     amount: {
@@ -22,8 +21,7 @@ export const participantSchema = new mongoose.Schema({
       required: true
     },
     forWhat: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Transaction',
+      type: String,
       required: true
     }
   }],

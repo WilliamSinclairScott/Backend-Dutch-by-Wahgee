@@ -28,6 +28,7 @@ export const getDivvyById = async (req, res) => {
 }
 
 /**
+ * [ 'yes', 'no' ]
  * @param {*} req PUT THE OWNER NAME IN THE PARTICIPANTS ARRAY
  * @param {*} res 
  */
@@ -41,22 +42,18 @@ export const createDivvy = async (req, res) => {
       return new Participant({ participantName : participant});
     });
 
-    console.log('newParticipants: ', newParticipants)
-
     const newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
       participants: newParticipants}
     )
 
-    console.log('newDivvy: ', newDivvy)
     await newDivvy.save();
     const ownerUser = await User.findByIdAndUpdate(owner, 
       { $push: { Divvys : newDivvy } },
       { new: true })
-    console.log(ownerUser)
     await ownerUser.save();
-    const response = await ownerUser.populate('Divvys');
+    const response = await ownerUser.populate('Divvys', '-password');
     res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
@@ -65,6 +62,7 @@ export const createDivvy = async (req, res) => {
 
 /**
  *  add delete participant and change name of divvy/participants
+ * [ {}, {namechanged} , 'bob'}]
  *  !!CANNOT DELETE PARTICIPANT IF OWESWHO IS NOT EMPTY
  * @param {*} req HAND ME ALL THE PARTICIPANTS, even the ones that arn't changed
  * @param {*} res 
@@ -86,9 +84,7 @@ export const updateDivvy = async (req, res) => {
       divvy.divvyName = divvyName;
     }
     // map the participants
-    console.log(divvy.participants)
     const updatedParticipants = participants.map(participant => {
-      console.log('participant: ', participant)
       //check if this participant is a string, or the participant Object
       if (typeof participant === 'string') {
           return new Participant({ participantName: participant });
@@ -120,7 +116,7 @@ export const updateDivvy = async (req, res) => {
     divvy.participants = updatedParticipants;
     //save the divvy
     await divvy.save();
-    const response = await ownerUser.populate('Divvys');
+    const response = await ownerUser.populate('Divvys, -password');
     res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error updating divvy', error: error.message });
@@ -129,6 +125,14 @@ export const updateDivvy = async (req, res) => {
 //delete divvy function
 export const deleteDivvy = async (req, res) => {
   try {
+    //remove the divvy id in the owners Divvy array
+    const owner = await User.findOne({ Divvys: req.params.id });
+    if (!owner) {
+      return res.status(404).json({ message: 'Owner not found' });
+    }
+    owner.Divvys = owner.Divvys.filter(divvy => divvy.toString() !== req.params.id);
+    await owner.save();
+    //delete the divvy
     const deleteDivvy = await Divvy.findByIdAndDelete(req.params.id);
     if (!deleteDivvy) {
       return res.status(404).json({ message: 'Divvy not found' });
