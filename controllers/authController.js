@@ -7,8 +7,8 @@ export const signup = async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         req.body.password = hashedPassword;
-        const user = await User.create(req.body);
-        res.json(user);
+        await User.create(req.body);
+        res.json({message: 'User created successfully'});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -22,7 +22,8 @@ export const login = async (req, res) => {
             if (result) {
                 const payload = { id: user._id, email: user.email, displayName: user.displayName };
                 const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1d' });
-                res.cookie('token', token, { httpOnly: true }).json(user);
+                const response = user.populate('Divvys', '-password');
+                res.cookie('token', token, { httpOnly: true }).json(response);
             } else {
                 res.status(400).json({ error: 'Password does not match' });
             }
