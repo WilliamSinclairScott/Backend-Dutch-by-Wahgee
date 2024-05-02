@@ -8,6 +8,8 @@ import Transaction from "../models/transactionModel.js";
 */
 
 //divvyRouter.post('/:id/transaction', createTransaction);
+
+//TODO: add type functionallity
 export const createTransaction = async (req, res) => {
   
   try { 
@@ -24,8 +26,8 @@ export const createTransaction = async (req, res) => {
       return res.status(404).json({ message: 'Divvy not found' });
     }
 
-    // Create an array of promises for each person involved in the transaction
-    const promises = breakdown.map(async personOfInterest => {
+    // Create an array for each person involved in the transaction
+    const promisedWork = breakdown.map(async personOfInterest => {
       try {
         console.log("looking for: ", personOfInterest);
         const existingParticipant = await divvy.participants.find(divParticipant => divParticipant.participantName === personOfInterest.name);
@@ -52,7 +54,7 @@ export const createTransaction = async (req, res) => {
     });
 
     // Wait for all the promises to resolve
-    await Promise.all(promises);
+    await Promise.all(promisedWork);
 
     console.log(divvy.participants);
 
@@ -69,73 +71,137 @@ export const createTransaction = async (req, res) => {
   }
 }
 //divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
+//TODO: FIX DUPING OF transaction
 export const updateTransaction = async (req, res) => {
 try {
   //getting divvyID and transactionID from the route
-  const { divvyId, transactionId } = req.params
-  const transactionUpdates = req.body
+  const { id, transactionId } = req.params
+  const { transactionName, amount, paidBy, type, breakdown } = req.body
   //find all users in the Divvy
-  const divvy = await Divvy.findById(divvyId)
-  //if participant in divvy has an owesWho.forWhat that matches the transactionId remove it
-  const participants = divvy.participants.map(async participant => {
-    participant.owesWho = participant.owesWho.filter(owe => owe.forWhat !== transactionId)
-  })
-  // Use Promise.all to handle all the operations 
-  Promise.all(participants)
+  const divvy = await Divvy.findById(id)
 
-  //getting data from the request
-  const { paidBy, breakdown, transactionName, amount } = req.body
-    
-
-  //foreach person that was involved in the transaction,
-  // assign percentage their responsible for,
-  // and if not participant, now they are (see upsert)
-      const involvedParticipants = breakdown.map(async participantInfo => {
-  
-        return await Participant.findOneAndUpdate(
-          // Assuming 'participantInfo' can be a string or an object containing a name and theirPart.
-          { name:  typeof participantInfo === 'string' ? 
-          participantInfo : participantInfo.name },
-          // Find or create participant using 'findOneAndUpdate' with 'upsert' option
-          {
-            $push: { 
-              owesWho: {
-                participant: paidBy,
-                amount: participantInfo.percentage * amount,
-                forWhat: transactionName
-              }
-            }}, 
-            { new: true, upsert: true })
-      });
-      // Use Promise.all to handle all the operations
-          Promise.all(involvedParticipants)
-
-      //make new transaction subdocument
-      const transaction = new Transaction(transactionUpdates) 
-      //update the transaction
-      const updatedDivvy = await Divvy.findByIdAndUpdate(
-        divvyId,
-        { $pull: { transactions: { _id: transactionId } }, 
-          $push: { transactions: transaction } },
-        { new: true }
-      );
-      updatedDivvy.transactions.push(transaction);
-      await updatedDivvy.save();
-  res.status(200).json(updatedDivvy)
-
-} catch (error) {
-  res.status(500).json({ message: 'Error updating transaction', error: error.message });
-}
+  //if divvy is not found, return 404
+  if (!divvy) {
+    return res.status(404).json({ message: 'Divvy not found' });
   }
+
+  //if participant in divvy has an owesWho.forWhat that matches the transactionName remove it
+
+  const participants = divvy.participants.map(async participant => {
+    participant.owesWho = await participant.owesWho.filter( owe => {
+      owe.forWhat !== transactionName})
+      return participant
+  })
+
+  // Use Promise.all to handle all the operations 
+  const updatedParticipants = await Promise.all(participants);
+
+  //update the participants in the divvy with the updated participants
+  divvy.participants = updatedParticipants;
+
+  //find the transaction in the divvy
+  const transaction = divvy.transactions.id(transactionId)
+
+  //update the transaction
+  transaction.transactionName = transactionName ? transactionName : transaction.transactionName;
+  transaction.amount = typeof amount === 'number' ? amount : transaction.amount;
+  transaction.paidBy = paidBy ? paidBy : transaction.paidBy;
+  transaction.type = type ? type : transaction.type;
+  transaction.breakdown = breakdown ? breakdown : transaction.breakdown;
+
+  //save to the divvy
+  divvy.transactions.id(transactionId).set(transaction);
+  //reapply the breakdown to the participants
+  // Create an array for each person involved in the transaction
+  const promisedWork = breakdown.map( async personOfInterest => {
+    try {
+      const existingParticipant = divvy.participants.find(divParticipant => {
+        return divParticipant.participantName === personOfInterest.name ? divParticipant : null;
+      });
+
+      if (existingParticipant) {
+        existingParticipant.owesWho.push({
+          name: transaction.paidBy,
+          amount: personOfInterest.percentage * transaction.amount,
+          forWhat: transactionName
+        });
+        return existingParticipant;
+      } else {
+        divvy.participants.push(new Participant({participantName: personOfInterest.name, owesWho: [{
+          name: transaction.paidBy,
+          amount: personOfInterest.percentage * transaction.amount,
+          forWhat: transactionName
+        }]}));
+        return divvy.participants[divvy.participants.length - 1];
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error updating owesWho', error: error.message });
+    }
+  });
+
+  // Wait for all the promises to resolve
+  const updated = await Promise.all(promisedWork);
+  console.log('participant part of the breakdown', updated);
+  
+  //find the participant in the divvy who wern't in the breakdown
+  const participantsNotInBreakdown = divvy.participants.filter(participant => {
+    return !updated.includes(participant);
+  });
+  
+  console.log('participants not in breakdown', participantsNotInBreakdown);
+
+  //concat the participants not in the breakdown to the updated participants
+  const finalParticipantArray = updated.concat(participantsNotInBreakdown);
+
+  //update the divvy with the final participant array
+  divvy.participants = finalParticipantArray;
+
+  //update the divvy
+  await divvy.save();
+  res.status(200).json(divvy);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating transaction', error: error.message });
+  }
+}
 
 export const deleteTransaction = async (req, res) => {
   try {
-    const { divvyId, transactionId } = req.params;
-    const divvy = await Divvy.findById(divvyId);
-    const updated = divvy.transactions.filter(transaction => transaction._id !== transactionId);
-    divvy.transactions = updated;
+    //getting divvyID and transactionID from the route
+    const { id, transactionId } = req.params
+    //find all users in the Divvy
+    const divvy = await Divvy.findById(id)
+
+    //if divvy is not found, return 404
+    if (!divvy) {
+      return res.status(404).json({ message: 'Divvy not found' });
+    }
+
+    //find the transaction in the divvy
+    const transaction = divvy.transactions.id(transactionId)
+
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    const { transactionName } = transaction;
+    //if participant in divvy has an owesWho.forWhat that matches the transactionName remove it
+    const participants = divvy.participants.map(async participant => {
+      participant.owesWho = await participant.owesWho.filter( owe => {
+        owe.forWhat !== transactionName})
+        return participant
+    })
+
+    // Use Promise.all to handle all the operations 
+    const updatedParticipants = await Promise.all(participants);
+
+    //update the participants in the divvy with the updated participants
+    divvy.participants = updatedParticipants;
+
+    //pull the transaction
+    divvy.transactions.pull(transaction);
+    //save the divvy
     await divvy.save();
-    res.status(200).json(divvy);
+    res.status(200).json({ message: 'Transaction deleted successfully' });
 } catch (error) {
     res.status(500).json({ message: 'Error deleting transaction', error: error.message });
 }
