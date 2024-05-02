@@ -22,7 +22,7 @@ export const login = async (req, res) => {
             if (result) {
                 const payload = { id: user._id, email: user.email, displayName: user.displayName };
                 const token = jwt.sign(payload, process.env.SECRET, { expiresIn: '1d' });
-                const response = user.populate('Divvys', '-password');
+                const response = await user.populate('Divvys', '-password');
                 res.cookie('token', token, { httpOnly: true }).json(response);
             } else {
                 res.status(400).json({ error: 'Password does not match' });
