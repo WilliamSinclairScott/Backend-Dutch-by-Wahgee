@@ -6,6 +6,7 @@ import User from '../models/userModel.js';
 
 
 //get all divvys function
+//not in use
 export const getAllDivvys = async (req, res) => {
   try {
     const divvys = await Divvy.find().populate('participants transactions')
@@ -15,6 +16,7 @@ export const getAllDivvys = async (req, res) => {
   }
 }
 //get divvy by id function
+//not in use
 export const getDivvyById = async (req, res) => {
   try { 
     const divvy = await Divvy.findById(req.params.id).populate('participants transactions')
@@ -53,6 +55,7 @@ export const createDivvy = async (req, res) => {
       { $push: { Divvys : newDivvy } },
       { new: true })
     await ownerUser.save();
+    //TODO: deconstruct, send correctly
     const response = await ownerUser.populate('Divvys', '-password');
     res.status(201).json(response)
   } catch (error) {
@@ -116,6 +119,7 @@ export const updateDivvy = async (req, res) => {
     divvy.participants = updatedParticipants;
     //save the divvy
     await divvy.save();
+    //TODO: deconstruct, send correctly
     const response = await ownerUser.populate('Divvys');
     res.status(201).json(response)
   } catch (error) {
