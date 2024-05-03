@@ -5,7 +5,6 @@ import User from '../models/userModel.js';
 
 
 
-//get all divvys function
 //not in use
 export const getAllDivvys = async (req, res) => {
   try {
@@ -15,23 +14,24 @@ export const getAllDivvys = async (req, res) => {
       res.status(500).json({ message: 'Error getting divvys', error: error.message })
   }
 }
-//get divvy by id function
-//not in use
+
 export const getDivvyById = async (req, res) => {
   try { 
-    const divvy = await Divvy.findById(req.params.id).populate('participants transactions')
+    const divvy = await Divvy.findById(req.params.id)
     if (!divvy) {
       return res.status(404).json({ message: 'Divvy not found' })
     }
-      res.status(200).json(divvy)
+    //make a fake user
+    const fakeUser = { email: 'guest@wahgee.com', displayName: 'Guest', Divvys : [divvy]  };
+      res.status(200).json(fakeUser)
   } catch (error) {
       res.status(500).json({ message: 'Error getting divvy', error: error.message })
   }
 }
 
 /**
- * [ 'yes', 'no' ]
- * @param {*} req PUT THE OWNER NAME IN THE PARTICIPANTS ARRAY
+ * 
+ * @param {*} req An array of all participants (including the owner)
  * @param {*} res 
  */
 export const createDivvy = async (req, res) => {
@@ -55,8 +55,9 @@ export const createDivvy = async (req, res) => {
       { $push: { Divvys : newDivvy } },
       { new: true })
     await ownerUser.save();
-    //TODO: deconstruct, send correctly
-    const response = await ownerUser.populate('Divvys', '-password');
+    const populated = await ownerUser.populate('Divvys');
+    const { _id, email, displayName, Divvys} = populated;
+    const response = { userID: _id, email, displayName, Divvys };
     res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error creating divvy', error: error.message });
@@ -119,9 +120,12 @@ export const updateDivvy = async (req, res) => {
     divvy.participants = updatedParticipants;
     //save the divvy
     await divvy.save();
-    //TODO: deconstruct, send correctly
-    const response = await ownerUser.populate('Divvys');
-    res.status(201).json(response)
+    //get user of divvy
+    const user = await User.findById(divvy.owner);
+    const populated = await user.populate('Divvys');
+    const { _id, email, displayName, Divvys} = populated;
+    const response = { userID: _id, email, displayName, Divvys };
+    res.status(201).json(response);
   } catch (error) {
       res.status(500).json({ message: 'Error updating divvy', error: error.message });
   }
@@ -141,7 +145,11 @@ export const deleteDivvy = async (req, res) => {
     if (!deleteDivvy) {
       return res.status(404).json({ message: 'Divvy not found' });
     }
-    res.status(200).json({ message: 'Divvy deleted successfully' });
+    //get user of divvy
+    const populated = await owner.populate('Divvys');
+    const { _id, email, displayName, Divvys} = populated;
+    const response = { userID: _id, email, displayName, Divvys };
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: 'Error deleting divvy', error: error.message });
   }

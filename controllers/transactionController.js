@@ -1,15 +1,9 @@
 import Divvy from "../models/divvyModel.js";
 import Participant from "../models/participantModel.js";
 import Transaction from "../models/transactionModel.js";
-/**
-  *divvyRouter.post('/:id/transactions', createTransaction);
-  *divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
-  *divvyRouter.get('/:id/transactions', deleteTransaction);
-*/
+import User from "../models/userModel.js";
 
-//divvyRouter.post('/:id/transaction', createTransaction);
 
-//TODO: add type functionallity
 export const createTransaction = async (req, res) => {
   
   try { 
@@ -29,9 +23,7 @@ export const createTransaction = async (req, res) => {
     // Create an array for each person involved in the transaction
     const promisedWork = breakdown.map(async personOfInterest => {
       try {
-        console.log("looking for: ", personOfInterest);
         const existingParticipant = await divvy.participants.find(divParticipant => divParticipant.participantName === personOfInterest.name);
-        console.log("We found the existing participant: ", existingParticipant);
         if (existingParticipant) {
           existingParticipant.owesWho.push({
             name: paidBy,
@@ -56,22 +48,24 @@ export const createTransaction = async (req, res) => {
     // Wait for all the promises to resolve
     await Promise.all(promisedWork);
 
-    console.log(divvy.participants);
-
     // Make new transaction subdocument
     const transaction = new Transaction({ transactionName, amount, paidBy, type, breakdown });
 
     // Update the transaction
     divvy.transactions.push(transaction);
     await divvy.save();
-
-    res.status(201).json(divvy);
+    //get user of divvy
+    const user = await User.findById(divvy.owner);
+    const populated = await user.populate('Divvys');
+    const { _id, email, displayName, Divvys} = populated;
+    const response = { userID: _id, email, displayName, Divvys };
+    res.status(201).json(response);
   } catch (error) {
     res.status(500).json({ message: 'Error creating transaction', error: error.message });
   }
 }
-//divvyRouter.put('/:id/transactions/:transactionId', updateTransaction);
-//TODO: FIX DUPING OF transaction
+
+
 export const updateTransaction = async (req, res) => {
 try {
   //getting divvyID and transactionID from the route
@@ -153,9 +147,12 @@ try {
   //update the divvy with the final participant array
   divvy.participants = finalParticipantArray;
 
-  //update the divvy
-  await divvy.save();
-  res.status(200).json(divvy);
+  //get user of divvy
+  const user = await User.findById(divvy.owner);
+  const populated = await user.populate('Divvys');
+  const { _id, email, displayName, Divvys} = populated;
+  const response = { userID: _id, email, displayName, Divvys };
+  res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: 'Error updating transaction', error: error.message });
   }
@@ -198,7 +195,12 @@ export const deleteTransaction = async (req, res) => {
     divvy.transactions.pull(transaction);
     //save the divvy
     await divvy.save();
-    res.status(200).json({ message: 'Transaction deleted successfully' });
+    //get user of divvy
+    const user = await User.findById(divvy.owner);
+    const populated = await user.populate('Divvys');
+    const { _id, email, displayName, Divvys} = populated;
+    const response = { userID: _id, email, displayName, Divvys };
+    res.status(200).json(response);
 } catch (error) {
     res.status(500).json({ message: 'Error deleting transaction', error: error.message });
 }
