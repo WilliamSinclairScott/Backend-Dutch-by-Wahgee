@@ -123,14 +123,14 @@ try {
         existingParticipant.owesWho.push({
           name: transaction.paidBy,
           amount: personOfInterest.percentage * transaction.amount,
-          forWhat: transactionName
+          forWhat: transaction.transactionName
         });
         return existingParticipant;
       } else {
         divvy.participants.push(new Participant({participantName: personOfInterest.name, owesWho: [{
           name: transaction.paidBy,
           amount: personOfInterest.percentage * transaction.amount,
-          forWhat: transactionName
+          forWhat: transaction.transactionName
         }]}));
         return divvy.participants[divvy.participants.length - 1];
       }
@@ -141,14 +141,11 @@ try {
 
   // Wait for all the promises to resolve
   const updated = await Promise.all(promisedWork);
-  console.log('participant part of the breakdown', updated);
   
   //find the participant in the divvy who wern't in the breakdown
   const participantsNotInBreakdown = divvy.participants.filter(participant => {
     return !updated.includes(participant);
   });
-  
-  console.log('participants not in breakdown', participantsNotInBreakdown);
 
   //concat the participants not in the breakdown to the updated participants
   const finalParticipantArray = updated.concat(participantsNotInBreakdown);
