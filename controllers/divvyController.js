@@ -116,7 +116,7 @@ export const updateDivvy = async (req, res) => {
     divvy.participants = updatedParticipants;
     //save the divvy
     await divvy.save();
-    const response = await ownerUser.populate('Divvys, -password');
+    const response = await ownerUser.populate('Divvys');
     res.status(201).json(response)
   } catch (error) {
       res.status(500).json({ message: 'Error updating divvy', error: error.message });
