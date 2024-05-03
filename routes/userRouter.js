@@ -26,9 +26,8 @@ userRouter.post('/login', login);
 //not in use...
 userRouter.get('/:userId/divvys', getDivvysByUserId); 
 userRouter.get('/:id', getUserById);
+userRouter.patch('/:id' ,updateUserById);
 
-userRouter.patch('/:id' ,updateUserById); //
- 
 userRouter.delete('/:id', authCheck ,deleteUserById);
 
 export default userRouter;
