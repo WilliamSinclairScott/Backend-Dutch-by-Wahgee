@@ -8,7 +8,8 @@ export const transactionSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    required: false
+    required: false,
+    default: Date.now
   },
   amount: {
     type: Number,
