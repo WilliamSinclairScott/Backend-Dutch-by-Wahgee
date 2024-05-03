@@ -20,10 +20,10 @@ const divvyRouter = express.Router();
 
 //Divvy Routes
 divvyRouter.get('/', getAllDivvys);
-divvyRouter.get('/:id', getDivvyById); //
-divvyRouter.post('/', createDivvy); //
-divvyRouter.patch('/:id', updateDivvy); //
-divvyRouter.delete('/:id', deleteDivvy);
+divvyRouter.get('/:id', getDivvyById);
+divvyRouter.post('/', authCheck, createDivvy);
+divvyRouter.patch('/:id', updateDivvy); 
+divvyRouter.delete('/:id', authCheck, deleteDivvy);
 
 //Transaction Routes
 divvyRouter.post('/:id/transaction', createTransaction); // 

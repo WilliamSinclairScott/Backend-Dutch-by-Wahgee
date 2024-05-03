@@ -18,22 +18,16 @@ import { authCheck } from '../utils/auth.js'
 const userRouter = express.Router();
 
 //signup
-userRouter.post('/signup', signup); //
+userRouter.post('/signup', signup);
 
 //login
 userRouter.post('/login', login);
 
-// get all divvys by a user
+//not in use...
 userRouter.get('/:userId/divvys', getDivvysByUserId); 
-
-// get a user by ID
 userRouter.get('/:id', getUserById);
+userRouter.patch('/:id' ,updateUserById);
 
-// update a user
-userRouter.patch('/:id' ,updateUserById); //
-
-
-// delete a user 
 userRouter.delete('/:id', authCheck ,deleteUserById);
 
 export default userRouter;
