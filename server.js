@@ -15,7 +15,7 @@ import divvyRouter from './routes/divvyRouter.js'
 const PORT = process.env.PORT || 7777
 const corsOptions = { 
   //!!Temporary unsecure fast and loose CORS policy
-  origin: [['http://localhost:5173', 'https://frontend-dutch-by-wahgee.vercel.app/']], 
+  origin: [['http://localhost:5173', 'https://frontend-dutch-by-wahgee.vercel.app']], 
   credentials: true
 }
 const app = express()
