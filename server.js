@@ -17,7 +17,7 @@ const corsOptions = {
   //!!Temporary unsecure fast and loose CORS policy
   origin: [['http://localhost:5173', 
   'https://frontend-dutch-by-wahgee.vercel.app',
-  'dutch.webdevstuff.ninja']], 
+  'https://dutch.webdevstuff.ninja']], 
   credentials: true
 }
 const app = express()
