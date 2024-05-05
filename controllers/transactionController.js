@@ -19,7 +19,7 @@ export const createTransaction = async (req, res) => {
     if (!divvy) {
       return res.status(404).json({ message: 'Divvy not found' });
     }
-
+    
     // Create an array for each person involved in the transaction
     const promisedWork = breakdown.map(async personOfInterest => {
       try {
@@ -98,7 +98,7 @@ try {
 
   //update the transaction
   transaction.transactionName = transactionName ? transactionName : transaction.transactionName;
-  transaction.amount = typeof amount === 'number' ? amount : transaction.amount;
+  transaction.amount = amount ? amount : transaction.amount;
   transaction.paidBy = paidBy ? paidBy : transaction.paidBy;
   transaction.type = type ? type : transaction.type;
   transaction.breakdown = breakdown ? breakdown : transaction.breakdown;
@@ -135,18 +135,16 @@ try {
 
   // Wait for all the promises to resolve
   const updated = await Promise.all(promisedWork);
-  
   //find the participant in the divvy who wern't in the breakdown
   const participantsNotInBreakdown = divvy.participants.filter(participant => {
     return !updated.includes(participant);
   });
-
   //concat the participants not in the breakdown to the updated participants
   const finalParticipantArray = updated.concat(participantsNotInBreakdown);
-
   //update the divvy with the final participant array
   divvy.participants = finalParticipantArray;
-
+  //save the divvy
+  await divvy.save();
   //get user of divvy
   const user = await User.findById(divvy.owner);
   const populated = await user.populate('Divvys');
