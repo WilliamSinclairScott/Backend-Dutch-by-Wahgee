@@ -106,7 +106,6 @@ try {
   //save to the divvy
   divvy.transactions.id(transactionId).set(transaction);
   //reapply the breakdown to the participants
-  console.log(breakdown)
   // Create an array for each person involved in the transaction
   const promisedWork = breakdown.map( async personOfInterest => {
     try {
@@ -140,15 +139,10 @@ try {
   const participantsNotInBreakdown = divvy.participants.filter(participant => {
     return !updated.includes(participant);
   });
-  console.log('participants Not in Breakdown',participantsNotInBreakdown)
   //concat the participants not in the breakdown to the updated participants
   const finalParticipantArray = updated.concat(participantsNotInBreakdown);
-
-  console.log('finalParticipantArray',finalParticipantArray)
   //update the divvy with the final participant array
   divvy.participants = finalParticipantArray;
-
-  console.log('divvy.participants',divvy.participants)
   //save the divvy
   await divvy.save();
   //get user of divvy
@@ -156,7 +150,6 @@ try {
   const populated = await user.populate('Divvys');
   const { _id, email, displayName, Divvys} = populated;
   const response = { userID: _id, email, displayName, Divvys };
-  console.log('response',response.Divvys[0].participants)
   res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: 'Error updating transaction', error: error.message });
