@@ -25,7 +25,7 @@ export const login = async (req, res) => {
                 const populated = await user.populate('Divvys');
                 const { _id, email, displayName, Divvys} = populated;
                 const response = { userID: _id, email, displayName, Divvys };
-                res.cookie('token', token, { httpOnly: false }).json(response);
+                res.cookie('token', token, { httpOnly: true }).json(response);
             } else {
                 res.status(400).json({ error: 'Password does not match' });
             }
