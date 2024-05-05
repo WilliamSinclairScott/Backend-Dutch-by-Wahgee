@@ -28,6 +28,6 @@ userRouter.get('/:userId/divvys', getDivvysByUserId);
 userRouter.get('/:id', getUserById);
 userRouter.patch('/:id' ,updateUserById);
 
-userRouter.delete('/:id', authCheck ,deleteUserById);
+userRouter.delete('/:id' ,deleteUserById);
 
 export default userRouter;
