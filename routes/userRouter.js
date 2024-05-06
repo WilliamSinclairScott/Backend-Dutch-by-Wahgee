@@ -24,9 +24,9 @@ userRouter.post('/signup', signup);
 userRouter.post('/login', login);
 
 //not in use...
-userRouter.get('/:userId/divvys', authCheck, getDivvysByUserId); 
-userRouter.get('/:id', authCheck, getUserById);
-userRouter.patch('/:id' ,authCheck, updateUserById);
-userRouter.delete('/:id' ,authCheck, deleteUserById);
+userRouter.get('/:userId/divvys', getDivvysByUserId); 
+userRouter.get('/:id', getUserById);
+userRouter.patch('/:id' , updateUserById);
+userRouter.delete('/:id' , deleteUserById);
 
 export default userRouter;
