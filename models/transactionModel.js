@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export const transactionSchema = new mongoose.Schema({
   transactionName: {
     type: String,
-    unique : true,
+    //unique : true,
     required: true
   },
   date: {
