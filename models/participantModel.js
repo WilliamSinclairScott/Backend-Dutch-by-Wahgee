@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 export const participantSchema = new mongoose.Schema({
   participantName: {
     type: String,
-    unique: true,
+    // unique: true,
     required: true
   },
   userID: {
