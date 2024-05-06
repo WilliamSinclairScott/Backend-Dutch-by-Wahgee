@@ -38,7 +38,6 @@ export const createDivvy = async (req, res) => {
   try {
     const {divvyName, owner, participants} = req.body;
     //participants is always an array of strings
-    (await User.findById(owner)) ? null : res.status(404).json({ message: 'Owner not found' });
     //make a participant for every participant in the participants array
     const newParticipants = participants.map( participant => {
       return new Participant({ participantName : participant});
@@ -47,7 +46,9 @@ export const createDivvy = async (req, res) => {
     const newDivvy = new Divvy({
       divvyName : divvyName, 
       owner: owner, 
-      participants: newParticipants}
+      participants: newParticipants,
+      transactions: []
+    }
     )
 
     await newDivvy.save();
